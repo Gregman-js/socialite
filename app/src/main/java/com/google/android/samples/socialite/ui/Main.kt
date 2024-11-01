@@ -40,6 +40,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.google.android.samples.socialite.model.extractChatId
+import com.google.android.samples.socialite.ui.add.Add
 import com.google.android.samples.socialite.ui.camera.Camera
 import com.google.android.samples.socialite.ui.camera.Media
 import com.google.android.samples.socialite.ui.camera.MediaType
@@ -96,6 +97,14 @@ fun MainNavigation(
             Home(
                 modifier = Modifier.fillMaxSize(),
                 onChatClicked = { chatId -> navController.navigate("chat/$chatId") },
+                onAddClicked = { navController.navigate("add") },
+            )
+        }
+        composable(
+            route = "add",
+        ) {
+            Add(
+                modifier = Modifier.fillMaxSize(),
             )
         }
         composable(
