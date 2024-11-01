@@ -16,6 +16,8 @@
 
 package com.google.android.samples.socialite.ui.home
 
+import android.Manifest
+import android.annotation.SuppressLint
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
@@ -33,6 +35,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.adaptive.navigationsuite.ExperimentalMaterial3AdaptiveNavigationSuiteApi
 import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -46,24 +49,37 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.samples.socialite.R
 import com.google.android.samples.socialite.ui.AnimationConstants
 import com.google.android.samples.socialite.ui.home.timeline.Timeline
 
+@SuppressLint("InlinedApi")
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun Home(
     onChatClicked: (chatId: Long) -> Unit,
     onAddClicked: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val permissionStates = rememberMultiplePermissionsState(listOf(
+        Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.BLUETOOTH_ADVERTISE,
+        Manifest.permission.BLUETOOTH_SCAN,
+        Manifest.permission.BLUETOOTH_CONNECT
+    ))
+
     Scaffold(
         modifier = modifier,
         topBar = { HomeAppBar(title = stringResource(R.string.chats)) },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddClicked,
-            ) {
-                Icon(Icons.Filled.Add, "Add chat.")
+            if (permissionStates.allPermissionsGranted) {
+                FloatingActionButton(
+                    onClick = onAddClicked,
+                ) {
+                    Icon(Icons.Filled.Add, "Add chat.")
+                }
             }
         }
     ) { innerPadding ->

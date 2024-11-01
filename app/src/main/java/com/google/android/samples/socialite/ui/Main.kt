@@ -16,10 +16,14 @@
 
 package com.google.android.samples.socialite.ui
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.os.Build
 import android.os.Bundle
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -29,6 +33,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
@@ -39,6 +44,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.samples.socialite.model.extractChatId
 import com.google.android.samples.socialite.ui.add.Add
 import com.google.android.samples.socialite.ui.camera.Camera
@@ -51,6 +58,7 @@ import com.google.android.samples.socialite.ui.photopicker.navigation.photoPicke
 import com.google.android.samples.socialite.ui.player.VideoPlayerScreen
 import com.google.android.samples.socialite.ui.videoedit.VideoEditScreen
 
+@SuppressLint("NewApi")
 @Composable
 fun Main(
     shortcutParams: ShortcutParams?,
@@ -61,11 +69,27 @@ fun Main(
     }
 }
 
+@SuppressLint("InlinedApi")
+@RequiresApi(Build.VERSION_CODES.S)
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainNavigation(
     modifier: Modifier,
     shortcutParams: ShortcutParams?,
 ) {
+    val permissionStates = rememberMultiplePermissionsState(listOf(
+        Manifest.permission.POST_NOTIFICATIONS,
+        Manifest.permission.BLUETOOTH_ADVERTISE,
+        Manifest.permission.BLUETOOTH_SCAN,
+        Manifest.permission.BLUETOOTH_CONNECT
+    ))
+
+    LaunchedEffect(permissionStates) {
+        if (!permissionStates.allPermissionsGranted) {
+            permissionStates.launchMultiplePermissionRequest()
+        }
+    }
+
     val activity = LocalContext.current as Activity
     val navController = rememberNavController()
 
